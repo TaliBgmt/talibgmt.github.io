@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bushveld Complex Knowledge Atlas — Weekly Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --surface: #0f0f0f;
+    --surface2: #161616;
+    --border: #222;
+    --text: #e2d9c8;
+    --muted: #666;
+    --faint: #1e1e1e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(160deg, #0d1a0d 0%, #0a0d1a 55%, #1a0d08 100%);
+    border-bottom: 1px solid #2a2a2a;
+    padding: 28px 32px 22px;
+  }
+  .header-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .header-eyebrow {
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #f0e8d8;
+    line-height: 1.1;
+  }
+  .header-sub {
+    font-size: 11px;
+    color: #8a7f70;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+  .overall-block { text-align: right; }
+  .overall-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .overall-pct {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    color: #e2d9c8;
+    transition: color 0.4s;
+  }
+  .overall-bar-wrap {
+    margin-top: 8px;
+    background: #1a1a1a;
+    border-radius: 3px;
+    height: 4px;
+    width: 160px;
+    margin-left: auto;
+    overflow: hidden;
+  }
+  .overall-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #4a9eca, #52b788);
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1080px; margin: 0 auto; padding: 28px 24px; }
+
+  /* ── MONTH GRID ── */
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+  .month-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 6px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .month-btn:hover { border-color: #444; }
+  .month-btn.active { border-width: 2px; }
+  .month-btn-num {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .month-btn-name {
+    font-size: 10px;
+    color: #999;
+    line-height: 1.3;
+    margin-bottom: 7px;
+  }
+  .month-btn.active .month-btn-name { color: #e2d9c8; }
+  .month-mini-bar-wrap {
+    background: #1a1a1a;
+    border-radius: 2px;
+    height: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .month-mini-bar { height: 100%; border-radius: 2px; transition: width 0.4s; }
+  .month-mini-pct { font-size: 9px; }
+
+  /* ── MONTH HEADER ── */
+  .month-header {
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid transparent;
+    transition: all 0.3s;
+  }
+  .month-header-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .month-header-theme {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #f0e8d8;
+  }
+  .month-progress-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px;
+    font-weight: 700;
+    text-align: right;
+    line-height: 1;
+    transition: color 0.3s;
+  }
+  .month-progress-label { font-size: 10px; color: var(--muted); text-align: right; margin-top: 2px; }
+
+  /* ── WEEKS ── */
+  .week-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .week-card:hover { border-color: #333; }
+
+  .week-header {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 13px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    color: var(--text);
+  }
+  .week-header-left { display: flex; align-items: center; gap: 12px; }
+  .week-tag {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    padding: 3px 9px;
+    border-radius: 5px;
+    border: 1px solid;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .week-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ddd5c5;
+  }
+  .week-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .week-header-right { display: flex; align-items: center; gap: 10px; }
+  .dot-row { display: flex; gap: 4px; }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    transition: background 0.2s;
+  }
+  .chevron { color: #555; font-size: 12px; transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+
+  /* ── DELIVERABLES ── */
+  .deliverables {
+    border-top: 1px solid var(--faint);
+    padding: 6px 18px 14px;
+    display: none;
+  }
+  .deliverables.open { display: block; }
+
+  .deliverable-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 9px 0;
+    border-bottom: 1px solid #141414;
+  }
+  .deliverable-row:last-child { border-bottom: none; }
+
+  .status-btn {
+    flex-shrink: 0;
+    margin-top: 1px;
+    width: 19px; height: 19px;
+    border-radius: 50%;
+    border: 2px solid #444;
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    transition: all 0.2s;
+    color: #fff;
+  }
+  .status-btn[data-s="done"] { background: #10b981; border-color: #10b981; }
+  .status-btn[data-s="progress"] { border-color: #f59e0b; background: transparent; }
+  .status-btn[data-s="none"] { border-color: #3a3a3a; }
+
+  .deliverable-text {
+    flex: 1;
+    line-height: 1.55;
+    color: #ccc5b8;
+    font-size: 12.5px;
+    transition: all 0.2s;
+  }
+  .deliverable-text.done { color: #555; text-decoration: line-through; }
+
+  .status-badge {
+    margin-top: 4px;
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .badge-none { background: #1a1a1a; color: #555; border-color: #2a2a2a; }
+  .badge-progress { background: #2d1f00; color: #f59e0b; border-color: #4a3000; }
+  .badge-done { background: #022c1a; color: #10b981; border-color: #064a2a; }
+
+  /* ── LEGEND ── */
+  .legend {
+    margin-top: 24px;
+    padding: 14px 18px;
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .legend-label { font-size: 10px; color: #444; letter-spacing: 2px; text-transform: uppercase; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .legend-text { font-size: 11px; color: #777; }
+  .legend-tip { font-size: 10px; color: #3a3a3a; margin-left: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="header-eyebrow">Knowledge Atlas Build Programme</div>
+      <div class="header-title">Bushveld Complex</div>
+      <div class="header-sub">Weekly Deliverables &nbsp;·&nbsp; June 2026 – May 2027 &nbsp;·&nbsp; BUGEMET &amp; CORES</div>
+    </div>
+    <div class="overall-block">
+      <div class="overall-label">Overall Progress</div>
+      <div class="overall-pct" id="overallPct">0%</div>
+      <div class="overall-bar-wrap"><div class="overall-bar" id="overallBar"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="month-grid" id="monthGrid"></div>
+  <div class="month-header" id="monthHeader">
+    <div>
+      <div class="month-header-label" id="mhLabel"></div>
+      <div class="month-header-theme" id="mhTheme"></div>
+    </div>
+    <div>
+      <div class="month-progress-num" id="mhPct"></div>
+      <div class="month-progress-label">month complete</div>
+    </div>
+  </div>
+  <div id="weeksContainer"></div>
+  <div class="legend">
+    <span class="legend-label">Status</span>
+    <div class="legend-item"><div class="legend-dot" style="background:#3a3a3a;border:2px solid #3a3a3a"></div><span class="legend-text">Not Started</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:transparent;border:2px solid #f59e0b"></div><span class="legend-text">In Progress</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div><span class="legend-text">Done</span></div>
+    <span class="legend-tip">Click the circle or badge to cycle status · Progress saves in your browser</span>
+  </div>
+</div>
+
+<script>
+const MONTHS = [
+  { month:1, label:"June 2026", theme:"Project Mobilisation", color:"#0d1a1a", accent:"#4a9eca", weeks:[
+    { week:1, title:"Environment & Repository Setup", deliverables:[
+      "Initialise version-controlled repository (Git) with README",
+      "Set up Python/conda environment file with all dependencies",
+      "Define folder structure for corpus, extraction, graph, spatial, and reports",
+      "Draft risk register v1 (data access, legal, technical, scope risks)"
+    ]},
+    { week:2, title:"Ontology & Schema Design", deliverables:[
+      "Draft controlled geological vocabulary v1 (units, zones, reefs, commodities)",
+      "Design document registry schema (fields: title, authors, DOI, source type, access status, hash)",
+      "Design knowledge graph schema (node classes, edge classes, metadata fields)",
+      "Design spatial feature schema (CRS, layer types, uncertainty fields)"
+    ]},
+    { week:3, title:"Governance & Operating Rules", deliverables:[
+      "Write atlas operating rules (source policy, hallucination-prevention rules, review workflow)",
+      "Define confidence-class framework (verified, machine-extracted, uncertain, conflicting)",
+      "Draft full geological scope document listing all mandatory modules",
+      "Set monthly reporting template structure"
+    ]},
+    { week:4, title:"Month-End Integration & Reporting", deliverables:[
+      "Integrate repository, schema, and operating-rules documents",
+      "Produce first monthly report confirming scope, exclusions, and governance",
+      "Circulate risk register for review",
+      "Confirm month-by-month priorities for the 12-month plan"
+    ]}
+  ]},
+  { month:2, label:"July 2026", theme:"Corpus Strategy & Bibliography", color:"#0d1a0f", accent:"#52b788", weeks:[
+    { week:5, title:"Keyword & Search String Library", deliverables:[
+      "Build keyword library covering all 10 geological modules",
+      "Create DOI/title search templates for each module",
+      "Define legal-access decision rules (open-access vs. metadata-only)",
+      "Identify primary journal sources (Economic Geology, Mineralium Deposita, etc.)"
+    ]},
+    { week:6, title:"Seed Bibliography — Base Geology & Stratigraphy", deliverables:[
+      "Compile 20–30 metadata records for base geology and stratigraphy",
+      "Tag each record with module, access status, and priority rank",
+      "Log sources where full text is unavailable (metadata-only workflow)",
+      "Begin DOI resolution and duplicate-check process"
+    ]},
+    { week:7, title:"Seed Bibliography — Petrology, Geochemistry & Deposits", deliverables:[
+      "Compile 20–30 metadata records for petrology, geochemistry, PGE, chromite",
+      "Add vanadium-titanium-iron, tin, and environmental themes",
+      "Refine source-ranking rules (citation count, recency, data richness)",
+      "Produce initial 50–100 metadata record list as deliverable"
+    ]},
+    { week:8, title:"Month-End Source Plan & Reporting", deliverables:[
+      "Complete source-acquisition plan document",
+      "Produce coverage gap analysis: which modules are under-sourced",
+      "Write monthly report: source coverage by module, missing themes",
+      "Prepare search strings for Month 3 ingestion acceleration"
+    ]}
+  ]},
+  { month:3, label:"August 2026", theme:"Dual Ingestion Pipeline", color:"#1a0d1a", accent:"#c77dff", weeks:[
+    { week:9, title:"Local-File Ingestion Notebook", deliverables:[
+      "Build local-file ingestion script: scan folder, hash files, extract metadata",
+      "Implement deduplication by hash and title similarity",
+      "Populate document registry with local files",
+      "Test on at least 10 local PDFs/files"
+    ]},
+    { week:10, title:"Internet-Journal Ingestion Notebook", deliverables:[
+      "Build internet-source download script using DOI/title/keyword search",
+      "Implement metadata-only workflow for inaccessible papers",
+      "Connect legal-access checks to download decisions",
+      "Log all download attempts (success, failure, reason)"
+    ]},
+    { week:11, title:"Registry Population & Failure Analysis", deliverables:[
+      "Merge local and internet records into single document registry",
+      "Run deduplication report across all records",
+      "Produce failure log (download failures, parsing errors, format issues)",
+      "Validate that all fields are consistently populated"
+    ]},
+    { week:12, title:"Month-End Ingestion Review", deliverables:[
+      "Demonstrate that local and internet files enter the same registry",
+      "Write monthly report: ingestion pipeline status, deduplication stats, failure analysis",
+      "Confirm traceability from source file to registry record",
+      "Plan PDF extraction priorities for Month 4"
+    ]}
+  ]},
+  { month:4, label:"September 2026", theme:"PDF Parsing & Text Extraction", color:"#1a1000", accent:"#f4a261", weeks:[
+    { week:13, title:"Text & Page-Level Extraction", deliverables:[
+      "Build PDF text extraction pipeline (PyMuPDF or pdfplumber)",
+      "Implement page-level chunking with page number, section, and document metadata",
+      "Flag OCR-required pages (scanned/raster PDFs)",
+      "Test on 5–10 priority geology papers"
+    ]},
+    { week:14, title:"Figure Captions & References", deliverables:[
+      "Implement figure-caption extraction (detect figure labels and caption text)",
+      "Build reference extraction parser (author, year, title, journal)",
+      "Generate APA reference examples from parsed data",
+      "Populate figure-caption table in registry"
+    ]},
+    { week:15, title:"Extraction QA & OCR", deliverables:[
+      "Run OCR on flagged scanned pages (Tesseract or equivalent)",
+      "Build parsing QA report: extraction success rate, failure types, blank pages",
+      "Cross-check extracted references against document registry records",
+      "Produce parsed-text table and chunk table as deliverables"
+    ]},
+    { week:16, title:"Month-End Traceability Demonstration", deliverables:[
+      "Demonstrate page-level traceability: query → chunk → page → document",
+      "Write monthly report: pages parsed, OCR pages, extraction successes and failures",
+      "Document citation-handling workflow (APA generation from extracted reference)",
+      "Identify extraction priorities for table work in Month 5"
+    ]}
+  ]},
+  { month:5, label:"October 2026", theme:"Table Extraction & Data Conversion", color:"#001220", accent:"#fcbf49", weeks:[
+    { week:17, title:"Stratigraphic & Geochemical Table Extraction", deliverables:[
+      "Build PDF table detection pipeline (camelot, tabula, or pdfplumber)",
+      "Target stratigraphic tables: unit, zone, thickness, depth, limb, marker",
+      "Target geochemical tables: analyte, unit, detection limit, rock type",
+      "Produce raw extracted tables with source page and table number"
+    ]},
+    { week:18, title:"Mineral Chemistry & Geochronology Tables", deliverables:[
+      "Extract mineral chemistry tables (chromite, magnetite, pyroxene, plagioclase)",
+      "Extract geochronology tables (age, method, mineral, uncertainty, reference)",
+      "Implement unit dictionary (standardise ppm, wt%, Ma, μm, etc.)",
+      "Tag each table with quality flag (machine-extracted, manually-reviewed)"
+    ]},
+    { week:19, title:"CSV/Excel Conversion & QC", deliverables:[
+      "Convert cleaned tables to CSV and Excel with provenance fields",
+      "Populate: source document, page number, table number, extraction method, review status",
+      "Run table QC report: row/column counts, unit consistency, null values",
+      "Flag tables requiring manual correction"
+    ]},
+    { week:20, title:"Month-End Table Demonstration", deliverables:[
+      "Demonstrate PDF-to-CSV/Excel conversion end-to-end for one key table",
+      "Write monthly report: tables detected, exported, QC flags, extraction limitations",
+      "Archive all raw and cleaned table files",
+      "Plan geological module population for Month 6"
+    ]}
+  ]},
+  { month:6, label:"November 2026", theme:"Base Geology & Spatial Skeleton", color:"#001428", accent:"#66c0f4", weeks:[
+    { week:21, title:"Base Geology Module", deliverables:[
+      "Populate base geology module: Rustenburg Layered Suite, Lebowa Granite Suite, Rooiberg Group, Rashoop Granophyre Suite",
+      "Build geological hierarchy table (suite → limb → zone → unit)",
+      "Add source-linked unit descriptions with confidence flags",
+      "Create terminology conflict log for alternative naming conventions"
+    ]},
+    { week:22, title:"Stratigraphic Hierarchy & Dictionary", deliverables:[
+      "Build stratigraphic dictionary: Marginal Zone, Lower Zone, Critical Zone, Main Zone, Upper Zone, subzones",
+      "Populate reef/layer register: Merensky Reef, UG2, Platreef, chromitite layers, magnetite layers",
+      "Map stratigraphic correlations across Western, Eastern, and Northern Limbs",
+      "Add graph nodes and edges for zones and layers"
+    ]},
+    { week:23, title:"Spatial Layer Catalogue & First Map", deliverables:[
+      "Compile GIS-ready spatial layers: Bushveld outline, limb boundaries, mine/deposit points",
+      "Assign CRS (WGS84/UTM) and document spatial metadata for each layer",
+      "Produce first regional map (Bushveld outline, limbs, major mines)",
+      "Link spatial features to source documents (map references, coordinate extraction)"
+    ]},
+    { week:24, title:"Month-End Geological Framework Review", deliverables:[
+      "Review whether geological framework is structurally sound",
+      "Write monthly report: base geology module status, spatial layer inventory, terminology conflicts",
+      "Demonstrate stratigraphic query: 'What are the chromitite layers in the Critical Zone?'",
+      "Plan scientific-process module expansion for Month 7"
+    ]}
+  ]},
+  { month:7, label:"December 2026", theme:"Petrology, Geochemistry & Isotopes", color:"#1a0808", accent:"#e63946", weeks:[
+    { week:25, title:"Petrology & Petrography Module", deliverables:[
+      "Populate petrographic evidence table: rock types, cumulate textures, mineral assemblages",
+      "Build figure-caption index for petrographic images",
+      "Create texture vocabulary (adcumulate, orthocumulate, mesocumulate, etc.)",
+      "Add graph links: rock type → unit → process"
+    ]},
+    { week:26, title:"Geochemistry Database v1", deliverables:[
+      "Populate geochemical database: major elements, trace elements, REE, PGE by unit",
+      "Standardise analytes and detection limits across sources",
+      "Add method metadata (XRF, ICP-MS, INAA, etc.) and QA/QC flags",
+      "Build chemostratigraphic profiles where data is available"
+    ]},
+    { week:27, title:"Isotopes, Geochronology & Hypothesis Register", deliverables:[
+      "Populate age/isotope table: U-Pb, Re-Os, Sm-Nd, Sr, S, O, H with method and uncertainty",
+      "Build chronological timeline of Bushveld emplacement and mineralisation",
+      "Start hypothesis register: competing petrogenesis models",
+      "Build evidence-for/evidence-against tables for each major hypothesis"
+    ]},
+    { week:28, title:"Month-End Scientific Module Review", deliverables:[
+      "Write monthly report: accepted knowledge, debated models, source gaps",
+      "Demonstrate hypothesis-comparison query for chromitite formation models",
+      "Archive petrogenesis hypothesis matrix",
+      "Plan PGE and chromite module work for Month 8"
+    ]}
+  ]},
+  { month:8, label:"January 2027", theme:"PGE & Chromite Mineral Systems", color:"#080e1a", accent:"#e2c08d", weeks:[
+    { week:29, title:"Merensky Reef Module", deliverables:[
+      "Populate Merensky Reef module: lithology, PGE grades, thickness, footwall/hangingwall contacts",
+      "Extract and clean Merensky Reef grade/thickness tables from key sources",
+      "Map Merensky Reef across Western and Eastern Limbs",
+      "Add graph nodes: Reef → Zone → Commodity → Mine"
+    ]},
+    { week:30, title:"UG2 & Platreef Modules", deliverables:[
+      "Populate UG2 chromitite module: chromite chemistry, PGE tenor, lateral continuity",
+      "Populate Platreef module: Ni-Cu-PGE, thickness variability, footwall lithologies",
+      "Build UG2/Merensky/Platreef comparison table (grade, thickness, mineralogy, host)",
+      "Add spatial features for Platreef deposit area"
+    ]},
+    { week:31, title:"Chromite Layer Register & Graph", deliverables:[
+      "Compile chromite layer register: LG, MG, UG series with stratigraphy and chemistry",
+      "Add Cr2O3, FeO, Al2O3, TiO2 and Cr/Fe ratio data where available",
+      "Build PGE/chromite knowledge-graph edges",
+      "Run query tests for reef and deposit fact-finding questions"
+    ]},
+    { week:32, title:"Month-End PGE Demonstration", deliverables:[
+      "Write monthly report: PGE/chromite module status, fact-finding demonstration, source gaps",
+      "Demonstrate source-backed synthesis comparing PGE grades across reefs",
+      "Archive all PGE/chromite tables and graph exports",
+      "Plan vanadium-titanium-iron and broader commodity work for Month 9"
+    ]}
+  ]},
+  { month:9, label:"February 2027", theme:"Broader Commodity Coverage", color:"#100a1a", accent:"#a855f7", weeks:[
+    { week:33, title:"Vanadiferous Titanomagnetite Module", deliverables:[
+      "Populate V-Ti-Fe module: magnetite layer stratigraphy, V2O5 grades, Ti content",
+      "Extract vanadium and titanium tables from key Upper Zone sources",
+      "Build magnetite layer register (Main Magnetite Layer + numbered layers)",
+      "Link to active V-Ti-Fe mines and deposits in spatial atlas"
+    ]},
+    { week:34, title:"Tin, Rare Metals & Fluorite Modules", deliverables:[
+      "Populate tin/rare-metal module: Zaaiplaats, Rooiberg, Lebowa Granite Suite tin deposits",
+      "Add cassiterite, fluorite, and phosphate occurrence records",
+      "Extract Sn grades and deposit geometry data where available",
+      "Flag evidence gaps for rare-metal and industrial-mineral themes"
+    ]},
+    { week:35, title:"Deposit Map & Industrial Minerals Inventory", deliverables:[
+      "Update deposit map with all commodity types (PGE, Cr, V-Ti-Fe, Sn, F, P)",
+      "Build industrial-mineral inventory (dimension stone, silica, phosphate prospects)",
+      "Link all deposits to commodities, units, limbs, sources in graph",
+      "Produce extracted V/Ti/Fe/Sn tables as deliverable"
+    ]},
+    { week:36, title:"Month-End Commodity Coverage Review", deliverables:[
+      "Write monthly report: confirm atlas covers all major mineral systems beyond PGE/chromite",
+      "Demonstrate commodity-comparison query across all major mineral systems",
+      "Archive deposit inventory and map layers",
+      "Plan environmental and geobiology module for Month 10"
+    ]}
+  ]},
+  { month:10, label:"March 2027", theme:"Geobiology & Environmental Systems", color:"#041404", accent:"#86efac", weeks:[
+    { week:37, title:"Geobiology & Mine Water Module", deliverables:[
+      "Populate geobiology/environment module: biogeochemical signatures, microbial metal mobility",
+      "Build mine-water evidence table: AMD, pH, metal concentrations, neutralisation",
+      "Add tailings and waste-facility records with commodity-type tags",
+      "Link environmental records to deposits and mines in graph"
+    ]},
+    { week:38, title:"Weathering, Tailings & Remediation", deliverables:[
+      "Populate tailings/weathering evidence: acid generation potential, neutralisation potential",
+      "Add bioleaching and microbial remediation literature records where available",
+      "Build mine-waste registry with facility location, commodity, and status",
+      "Flag records where evidence is thin or contradictory"
+    ]},
+    { week:39, title:"Environmental Spatial Layers", deliverables:[
+      "Add environmental spatial layers: mine footprints, tailings storage facilities, drainage catchments",
+      "Link spatial features to mine-water and tailings evidence records",
+      "Build process-risk tags (acid drainage risk, metal leaching, dust dispersion)",
+      "Integrate graph-spatial-evidence links for environmental features"
+    ]},
+    { week:40, title:"Month-End Environmental Module Review", deliverables:[
+      "Write monthly report: demonstrate environmental query with appropriate uncertainty handling",
+      "Show graph-spatial-evidence link for one mine-water or tailings case",
+      "Archive environmental module and spatial exports",
+      "Plan query engine and RAG benchmarking for Month 11"
+    ]}
+  ]},
+  { month:11, label:"April 2027", theme:"Query Engine & Benchmarking", color:"#111111", accent:"#fbbf24", weeks:[
+    { week:41, title:"Vector Index & Query Engine v1", deliverables:[
+      "Build vector index over all parsed chunks (FAISS or ChromaDB)",
+      "Implement retrieval-augmented generation (RAG) pipeline",
+      "Configure citation requirement: every answer must cite source and page",
+      "Implement refusal logic: engine must say 'unsupported' when no evidence exists"
+    ]},
+    { week:42, title:"Benchmark Query Suite", deliverables:[
+      "Write 30 benchmark queries across all mandatory query classes",
+      "Run all 30 queries and log: pass/fail, citation status, hallucination check",
+      "Include fact-finding, comparison, hypothesis, spatial, extraction, and provenance queries",
+      "Document hallucination-prevention test results"
+    ]},
+    { week:43, title:"Graph Visualisation & Map Interface", deliverables:[
+      "Build knowledge-graph visualisation (NetworkX + Gephi export, or Cytoscape)",
+      "Produce map interface mock-up showing spatial query capability",
+      "Demonstrate graph relationship for the Merensky Reef node",
+      "Update issue log with all outstanding query failures and edge cases"
+    ]},
+    { week:44, title:"Month-End Query Demonstration", deliverables:[
+      "Write monthly report: benchmark query results, hallucination test outcomes, spatial query demo",
+      "Demonstrate all mandatory query types under controlled test conditions",
+      "Archive query engine, benchmark results, and graph visualisation",
+      "Plan final integration and handover for Month 12"
+    ]}
+  ]},
+  { month:12, label:"May 2027", theme:"Final Integration & Handover", color:"#140a04", accent:"#f97316", weeks:[
+    { week:45, title:"Final Atlas Validation", deliverables:[
+      "Run full geological completeness check against all 10 mandatory modules",
+      "Run technical completeness check: ingestion, extraction, graph, spatial, query all working",
+      "Resolve or document all outstanding issues in issue log",
+      "Produce final corpus report: total documents, pages, tables, nodes, edges, spatial features"
+    ]},
+    { week:46, title:"Documentation & User Guides", deliverables:[
+      "Write user guide: how to run queries, retrieve tables, use graph, view maps",
+      "Write admin guide: how to ingest new files, update registry, rebuild index",
+      "Document all known limitations, edge cases, and evidence gaps",
+      "Archive all monthly reports, logs, and registry exports"
+    ]},
+    { week:47, title:"Final Demonstration Package", deliverables:[
+      "Record or prepare live demonstration of all 11 required demonstration items",
+      "Produce training slides for handover",
+      "Build final graph and spatial exports (GeoJSON, Shapefile, GraphML)",
+      "Prepare scale-up roadmap for expanding atlas beyond prototype"
+    ]},
+    { week:48, title:"Handover & Final Report", deliverables:[
+      "Deliver complete handover pack to BUGEMET and CORES",
+      "Submit final monthly report: readiness, limitations, unresolved issues, production roadmap",
+      "Confirm expert-review priorities for post-project knowledge-graph validation",
+      "Close the 12-month project formally with signed-off final atlas prototype"
+    ]}
+  ]}
+];
+
+// ── STATE ──
+const STORAGE_KEY = 'bushveld_status_v1';
+let statuses = {};
+try { statuses = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){}
+let openWeeks = {};
+let selectedMonth = 0;
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(statuses)); } catch(e){}
+}
+
+function statusKey(mi, week, di) { return `${mi}_${week}_${di}`; }
+
+function getStatus(mi, week, di) { return statuses[statusKey(mi,week,di)] || 'none'; }
+
+function cycleStatus(mi, week, di) {
+  const k = statusKey(mi,week,di);
+  const cur = statuses[k] || 'none';
+  statuses[k] = cur === 'none' ? 'progress' : cur === 'progress' ? 'done' : 'none';
+  save();
+  render();
+}
+
+function monthProgress(mi) {
+  const m = MONTHS[mi];
+  let total=0, done=0;
+  m.weeks.forEach(w => w.deliverables.forEach((_,di) => {
+    total++;
+    if(getStatus(mi,w.week,di)==='done') done++;
+  }));
+  return total ? Math.round(done/total*100) : 0;
+}
+
+function overallProgress() {
+  let total=0, done=0;
+  MONTHS.forEach((m,mi) => m.weeks.forEach(w => w.deliverables.forEach((_,di) => {
+    total++;
+    if(getStatus(mi,w.week,di)==='done') done++;
+  })));
+  return total ? Math.round(done/total*100) : 0;
+}
+
+// ── RENDER ──
+function render() {
+  const overall = overallProgress();
+  document.getElementById('overallPct').textContent = overall + '%';
+  document.getElementById('overallBar').style.width = overall + '%';
+  const op = document.getElementById('overallPct');
+  op.style.color = overall > 66 ? '#10b981' : overall > 33 ? '#f59e0b' : '#e2d9c8';
+
+  renderMonthGrid();
+  renderMonthHeader();
+  renderWeeks();
+}
+
+function renderMonthGrid() {
+  const grid = document.getElementById('monthGrid');
+  grid.innerHTML = '';
+  MONTHS.forEach((m, mi) => {
+    const p = monthProgress(mi);
+    const active = mi === selectedMonth;
+    const btn = document.createElement('button');
+    btn.className = 'month-btn' + (active ? ' active' : '');
+    btn.style.background = active ? m.color : 'var(--surface)';
+    btn.style.borderColor = active ? m.accent : 'var(--border)';
+    btn.innerHTML = `
+      <div class="month-btn-num" style="color:${active ? m.accent : 'var(--muted)'}">${'M'+m.month}</div>
+      <div class="month-btn-name">${m.label.split(' ')[0]}</div>
+      <div class="month-mini-bar-wrap">
+        <div class="month-mini-bar" style="width:${p}%;background:${m.accent}"></div>
+      </div>
+      <div class="month-mini-pct" style="color:${p>0 ? m.accent : '#333'}">${p}%</div>
+    `;
+    btn.addEventListener('click', () => { selectedMonth = mi; render(); });
+    grid.appendChild(btn);
+  });
+}
+
+function renderMonthHeader() {
+  const m = MONTHS[selectedMonth];
+  const p = monthProgress(selectedMonth);
+  const hdr = document.getElementById('monthHeader');
+  hdr.style.background = m.color;
+  hdr.style.borderColor = m.accent + '44';
+  document.getElementById('mhLabel').style.color = m.accent;
+  document.getElementById('mhLabel').textContent = `Month ${m.month} · ${m.label}`;
+  document.getElementById('mhTheme').textContent = m.theme;
+  const pctEl = document.getElementById('mhPct');
+  pctEl.textContent = p + '%';
+  pctEl.style.color = m.accent;
+}
+
+function renderWeeks() {
+  const m = MONTHS[selectedMonth];
+  const container = document.getElementById('weeksContainer');
+  container.innerHTML = '';
+
+  m.weeks.forEach((week, wi) => {
+    const wKey = `${selectedMonth}_${wi}`;
+    if (!(wKey in openWeeks)) openWeeks[wKey] = true;
+    const isOpen = openWeeks[wKey];
+
+    const wStatuses = week.deliverables.map((_,di) => getStatus(selectedMonth, week.week, di));
+    const done = wStatuses.filter(s=>s==='done').length;
+    const inProg = wStatuses.filter(s=>s==='progress').length;
+    const total = week.deliverables.length;
+
+    const card = document.createElement('div');
+    card.className = 'week-card';
+
+    // dots
+    const dots = week.deliverables.map((_,di) => {
+      const s = getStatus(selectedMonth, week.week, di);
+      const c = s==='done' ? '#10b981' : s==='progress' ? '#f59e0b' : '#2a2a2a';
+      return `<div class="dot" style="background:${c}"></div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <button class="week-header" data-wkey="${wKey}">
+        <div class="week-header-left">
+          <div class="week-tag" style="color:${m.accent};border-color:${m.accent}44;background:${m.color}">
+            WK ${week.week}
+          </div>
+          <div>
+            <div class="week-title">${week.title}</div>
+            <div class="week-sub">${done} of ${total} done${inProg > 0 ? ' · ' + inProg + ' in progress' : ''}</div>
+          </div>
+        </div>
+        <div class="week-header-right">
+          <div class="dot-row">${dots}</div>
+          <div class="chevron${isOpen?' open':''}">▼</div>
+        </div>
+      </button>
+      <div class="deliverables${isOpen?' open':''}" id="del_${wKey}">
+        ${week.deliverables.map((d,di) => {
+          const s = getStatus(selectedMonth, week.week, di);
+          const isDone = s==='done';
+          const badgeClass = s==='done'?'badge-done':s==='progress'?'badge-progress':'badge-none';
+          const badgeLabel = s==='done'?'Done':s==='progress'?'In Progress':'Not Started';
+          const dotC = s==='done'?'#10b981':s==='progress'?'#f59e0b':'';
+          const dotStyle = s==='done'
+            ? 'background:#10b981;border-color:#10b981'
+            : s==='progress'
+            ? 'background:transparent;border-color:#f59e0b'
+            : 'background:transparent;border-color:#3a3a3a';
+          const innerIcon = s==='done'?'✓':s==='progress'?'◐':'';
+          return `
+            <div class="deliverable-row">
+              <button class="status-btn" data-s="${s}" data-mi="${selectedMonth}" data-week="${week.week}" data-di="${di}" style="${dotStyle}">${innerIcon}</button>
+              <div>
+                <div class="deliverable-text${isDone?' done':''}">${d}</div>
+                <span class="status-badge ${badgeClass}" data-mi="${selectedMonth}" data-week="${week.week}" data-di="${di}">${badgeLabel}</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+
+    // toggle week open/close
+    card.querySelector('.week-header').addEventListener('click', () => {
+      openWeeks[wKey] = !openWeeks[wKey];
+      render();
+    });
+
+    // status buttons
+    card.querySelectorAll('.status-btn, .status-badge').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const mi = +el.dataset.mi;
+        const week = +el.dataset.week;
+        const di = +el.dataset.di;
+        cycleStatus(mi, week, di);
+      });
+    });
+
+    container.appendChild(card);
+  });
+}
+
+// ── INIT ──
+render();
+</script>
+</body>
+</html>
